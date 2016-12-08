@@ -325,7 +325,7 @@ first attribute specified so that a user can quickly see if the resource is bein
     }
 ```
 
-When using the special attribute `*` (asterisk or splat character) in addition to other attributes, splat should be ordered last so that it is easy to see.
+When using the special attribute `*` (asterisk or splat character) in addition to other attributes, splat should be ordered last so that it is easy to see. You may not include multiple splats in the same body.
 
 **Good**:
 
