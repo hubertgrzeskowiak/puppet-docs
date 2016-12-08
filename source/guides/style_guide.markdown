@@ -181,9 +181,11 @@ warning('Class[\'apache\'] parameter purge_vdir is deprecated in favor of purge_
 
 ### 6.1. Escape characters
 
-Puppet uses backslashes as an escape character. For both single- and double-quoted strings, escape the backslash to remove this special meaning: `\\`. This means that for every backslash you want to include in the resulting string, use two backslashes. For two literal backslashes, you would use four backslashes in total.
+Puppet uses backslash as an escape character. For both single- and double-quoted strings, escape the backslash to remove this special meaning: `\\` This means that for every backslash you want to include in the resulting string, use two backslashes. As an example, to include two literal backslashes in the string, you would use four backslashes in total.
 
 Do not rely on unrecognized escaped characters as a method for including the backslash and the character following it.
+
+Unicode character escapes using fewer than 4 hex digits, as in `\u040`, results in a backslash followed by the string `u040`. (This also causes a warning for the unrecognized escape.) To use a number of hex digits not equal to 4, use the longer `u{digits}` format.
 
 ## 7. Comments
 
@@ -310,7 +312,7 @@ attribute name. Nested blocks must be indented by two spaces, and hash rockets w
 ### 9.3. Attribute ordering
 
 If a resource declaration includes an `ensure` attribute, it should be the
-first attribute specified so a user can quickly see if the resource is being created or deleted.
+first attribute specified so that a user can quickly see if the resource is being created or deleted.
 
 **Good:**
 
@@ -321,6 +323,23 @@ first attribute specified so a user can quickly see if the resource is being cre
       group  => '0',
       mode   => '0644',
     }
+```
+
+When using the special attribute `*` (asterisk or splat character) in addition to other attributes, splat should be ordered last so that it is easy to see.
+
+**Good**:
+
+```
+$file_ownership = {
+  "owner" => "root",
+  "group" => "wheel",
+  "mode"  => "0644",
+}
+
+file { "/etc/passwd":
+  ensure => file,
+  *      => $file_ownership,
+}
 ```
 
 
@@ -418,6 +437,11 @@ file {
 # etc
 ```
 
+You cannot set any attribute more than once for a given resource; if you try, Puppet will raise a compilation error. This means:
+
+If you use a hash to set attributes for a resource, you cannot set a different, explicit value for any of those attributes. (If mode is present in the hash, you can’t also set mode => "0644" in that resource body.)
+You can’t use the * attribute multiple times in one resource body, since * itself acts like an attribute.
+If you want to use some attributes from a hash and override others, you can either use a hash to set per-expression defaults, or use the + (merging) operator to combine attributes from two hashes (with the right-hand hash overriding the left-hand one).
 ### 9.5. Symbolic links
 
 Symbolic links must be declared with an ensure value of `ensure => link` and explicitly specify a value for the `target` attribute. Doing so more explicitly informs the user that a link is being created.
