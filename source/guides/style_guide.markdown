@@ -87,11 +87,9 @@ file     { '/tmp/foo':
 
 ### 5.1: Arrays and hashes
 
-In data types such as Arrays and Hashes, place multiple elements on multiple lines. This makes it easier to see what has changed during code review.
+To increase readability of arrays and hashes, it is almost always beneficial to break up the elements on separate lines. Use a single line only if that results in overall better readability of the construct where it appears, such as when it is very short. When breaking arrays and hashes, they should have:
 
-Arrays and Hashes should have:
-
-* Each element on its own line,
+* Each element on its on line,
 * Each new element line indented one level,
 * First and last lines used only for the syntax of that data type.
 
