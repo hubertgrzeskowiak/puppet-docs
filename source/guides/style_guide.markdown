@@ -924,7 +924,7 @@ This is not necessary for:
 * the `$trusted` hash.
 * the `$server_facts` hash.
 
-These special variable names are protected; since you cannot create local variables with these names, they always refer to top-scope variables.
+These special variable names are protected; because you cannot create local variables with these names, they always refer to top-scope variables.
 
 **Good:**
 
@@ -940,8 +940,7 @@ These special variable names are protected; since you cannot create local variab
 
 ### 13.2. Variable format
 
-When defining variables you must only use numbers, lowercase letters, and
-underscores. You should not use camelcasing (uppercased letters within a word, such as "CamelCase"), as it introduces inconsistency in style. You must also not use dashes, as they are not syntactically valid.
+When defining variables you must only use numbers, lowercase letters, and underscores. You should not use camelcasing (uppercased letters within a word, such as "CamelCase"), as it introduces inconsistency in style. You must also not use dashes, as they are not syntactically valid.
 
 **Good:**
 
@@ -963,8 +962,7 @@ $foo-bar123
 
 ### 14.1. Keep resource declarations simple
 
-We recommend not mixing conditionals with resource declarations. When you use conditionals for data assignment, you should separate conditional code from the
-resource declarations.
+We recommend not mixing conditionals with resource declarations. When you use conditionals for data assignment, you should separate conditional code from the resource declarations.
 
 **Good:**
 
