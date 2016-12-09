@@ -702,9 +702,9 @@ Classes and defined resource types must not be defined within other classes or d
     }
 ```
 
-### 10.6. Display Order of Parameters
+### 10.6. Display order of parameters
 
-In parameterized class and defined type declarations, required parameters must be listed before optional parameters (that is, parameters with defaults). Required parameters are parameters which are not set to anything, including undef. For example, parameters that specify passwords have no reasonable default value.
+In parameterized class and defined type declarations, required parameters must be listed before optional parameters (that is, parameters with defaults). Required parameters are parameters which are not set to anything, including undef. For example, parameters such as passwords or IP addresses might not have reasonable default values.
 
 **Good:**
 
@@ -760,7 +760,7 @@ class my_module (
 }
 ```
 
-### 10.8 Exported Resources
+### 10.8 Exported resources
 
 Exported resources should be opt-in rather than opt-out. Your module should not be written to use exported resources to function by default unless it is expressly required. When using exported resources, you should name the property `collect_exported`.
 
@@ -785,7 +785,7 @@ define haproxy::frontend (
 
 ## 11. Classes
 
-### 11.1. Class Inheritance
+### 11.1. Class inheritance
 
 Inheritance can be used within a module, but must not be used across module
 namespaces. Cross-module dependencies should be satisfied in a more portable
@@ -878,11 +878,11 @@ Remember:
 
 Class inheritance should only be used for `myclass::params` parameter defaults. Other use cases can be accomplished through the addition of parameters or conditional logic. 
 
-### 11.2 A Note About Publicly Available Modules
+### 11.2 About publicly available modules
 
 When declaring classes in publicly available modules, you should use `include`, `contain`, or `require` rather than class resource declaration. This avoids duplicate class declarations and vendor lock-in.
 
-## 12. Defined Resource Types 
+## 12. Defined resource types 
 
 ### 12.1. Uniqueness
 
@@ -914,7 +914,7 @@ file { 'Required VHost directory':
 
 ## 13. Variables
 
-### 13.1. Namespacing Variables
+### 13.1. Namespacing variables
 
 When referencing top-scope variables, including facts, explicitly specify empty namespaces for clarity and improved readability.
  
@@ -938,7 +938,7 @@ These special variable names are protected; since you cannot create local variab
     $operatingsystem
 ```
 
-### 13.2. Variable Format
+### 13.2. Variable format
 
 When defining variables you must only use numbers, lowercase letters, and
 underscores. You should not use camelcasing (uppercased letters within a word, such as "CamelCase"), as it introduces inconsistency in style. You must also not use dashes, as they are not syntactically valid.
@@ -961,7 +961,7 @@ $foo-bar123
 
 ## 14. Conditionals
 
-### 14.1. Keep Resource Declarations Simple
+### 14.1. Keep resource declarations simple
 
 We recommend not mixing conditionals with resource declarations. When you use conditionals for data assignment, you should separate conditional code from the
 resource declarations.
@@ -996,7 +996,7 @@ resource declarations.
     }
 ```
 
-### 14.2. Defaults for Case Statements and Selectors
+### 14.2. Defaults for case statements and selectors
 
 Case statements must have default cases. If you want the default case to be "do nothing," you must include it as an explicit `default: {}` for clarity's sake.
 
@@ -1035,7 +1035,7 @@ Major use cases for your module should have corresponding example manifests in t
 
 The example manifest should provide a clear example of how to declare the class or defined resource type. The example manifest should also declare any classes required by the corresponding class to ensure `puppet apply` works in a limited, standalone manner.
 
-## 17. Module Documentation
+## 17. Module documentation
 
 All publicly available modules should include the documentation covered below.
 
