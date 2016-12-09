@@ -532,7 +532,7 @@ unpredictable effects far away from where the default was declared.
 
 ### 10.1. Separate files
 
-All classes and resource type definitions (defined types) must be separate files in the `manifests` directory of the module. 
+All classes and resource type definitions (defined types) must be separate files in the `manifests` directory of the module. Each separate file in the manifest directory of the module should contain nothing other than the class or resource type definition.
 
 **Good:**
 
@@ -549,9 +549,7 @@ All classes and resource type definitions (defined types) must be separate files
 
 Separating classes and defined types into separate files is functionally identical to declaring them in init.pp, but has the benefit of highlighting the structure of the module and making the function and structure more legible.
 
-In addition, each separate file in the manifest directory of the module should contain nothing other than the class or resource type definition.
-
-When a resource or include statement is placed outside of a class, node definition or defined type, it is included in all catalogs. This can have undesired effects and is not always easy to detect.
+When a resource or include statement is placed outside of a class, node definition, or defined type, it is included in all catalogs. This can have undesired effects and is not always easy to detect.
 
 **Good:**
 
@@ -943,7 +941,7 @@ These special variable names are protected; since you cannot create local variab
 ### 13.2. Variable Format
 
 When defining variables you must only use numbers, lowercase letters, and
-underscores. You should not use camelCasing, as it introduces inconsistency in style. You must also not use dashes, as they are not syntactically valid.
+underscores. You should not use camelcasing (uppercased letters within a word, such as "CamelCase"), as it introduces inconsistency in style. You must also not use dashes, as they are not syntactically valid.
 
 **Good:**
 
