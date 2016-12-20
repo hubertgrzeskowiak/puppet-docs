@@ -435,11 +435,12 @@ file {
 # etc
 ```
 
-You cannot set any attribute more than once for a given resource; if you try, Puppet will raise a compilation error. This means:
+You cannot set any attribute more than once for a given resource; if you try, Puppet raises a compilation error. This means:
 
-If you use a hash to set attributes for a resource, you cannot set a different, explicit value for any of those attributes. (If mode is present in the hash, you can’t also set mode => "0644" in that resource body.)
-You can’t use the * attribute multiple times in one resource body, since * itself acts like an attribute.
-If you want to use some attributes from a hash and override others, you can either use a hash to set per-expression defaults, or use the + (merging) operator to combine attributes from two hashes (with the right-hand hash overriding the left-hand one).
+* If you use a hash to set attributes for a resource, you cannot set a different, explicit value for any of those attributes. (For example, if mode is present in the hash, you can’t also set mode => "0644" in that resource body.)
+* You can’t use the `*` attribute multiple times in one resource body, because `*` itself acts like an attribute.
+* To use some attributes from a hash and override others, either use a hash to set per-expression defaults, or use the `+` (merging) operator to combine attributes from two hashes (with the right-hand hash overriding the left-hand one).
+
 ### 9.5. Symbolic links
 
 Symbolic links must be declared with an ensure value of `ensure => link` and explicitly specify a value for the `target` attribute. Doing so more explicitly informs the user that a link is being created.
@@ -526,6 +527,60 @@ unpredictable effects far away from where the default was declared.
     }
 ```
 
+### 9.8 Resource attribute indentation and alignment
+
+Resource attributes must be uniformly indented in one stop from the title.
+
+**Good**:
+
+```
+file { '/foo':
+  ensure => 'file',
+  owner  => 'root',
+}
+```
+
+**Bad**:
+
+```
+# too many levels of indentation
+file { '/foo':
+    ensure => 'file',
+    owner  => 'root',
+}
+
+# no indentation
+file { '/foo':
+ensure => 'file',
+owner  => 'root',
+}
+
+# improper and non-uniform indentation
+file { '/foo':
+  ensure => 'file',
+   owner => 'root',
+}
+
+# indented the wrong direction
+  file { '/foo':
+ensure => 'file',
+owner  => 'root',
+  }
+```
+
+For multiple bodies, each title should be on its own line, and be indented. You may align all arrows across the bodies, but arrow alignment is not required if alignment per body is more readable.
+
+```
+file {
+  default:
+    * => $local_defaults;
+ 
+  '/foo':
+    ensure => 'file'
+    owner  => root
+}
+```
+
 ## 10. Classes and defined types
 
 ### 10.1. Separate files
@@ -581,7 +636,11 @@ Classes and defined types must be structured to accomplish one task. Below is a 
 1. Next lines: Should declare resource defaults.
 1. Next lines:  Should override resources if necessary.
 
-The following example follows the recommended style:
+Parameters should be [typed](https://docs.puppet.com/puppet/latest/lang_data_type.html#language:-data-types:-data-type-syntax). For custom validation, type the parameter with a generic type and make sure additional constraints imposed by your logic are documented
+for public classes and defined types. Each parameter should include a documentation comment.
+
+
+The following example follows the recommended style: TODO: UPDATE EXAMPLE
 
 ```
     # init.pp
@@ -784,6 +843,8 @@ define haproxy::frontend (
 ## 11. Classes
 
 ### 11.1. Class inheritance
+
+Class inheritance should not be used. Instead, use data binding instead of `params.pp` pattern. Inheritance should only be used for `params.pp`, which is not recommended in Puppet 4.
 
 Inheritance can be used within a module, but must not be used across module
 namespaces. Cross-module dependencies should be satisfied in a more portable
