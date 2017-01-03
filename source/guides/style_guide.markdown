@@ -636,17 +636,20 @@ Classes and defined types must be structured to accomplish one task. Below is a 
 1. Next lines: Should declare resource defaults.
 1. Next lines:  Should override resources if necessary.
 
-The following example follows the recommended style:
+The following examples follows the recommended style:
 
 In init.pp:
 
 ```
-# The `myservice` class installs packages, and ensures the state of 'myservice' and creates a tempfile with
-# given content. If the tempfile contents contains digits they are filtered out.
+# The `myservice` class installs packages, ensures the state of 'myservice', and creates 
+# a tempfile with given content. If the tempfile contents contains digits,
+# they are filtered out.
 #
 # @param service_ensure the wanted state of services
-# @param package_list the list of packages to install, at least one must be given, or an error of unsupported 'os' is raised
-# @param tempfile_contents the text ending up in the tempfile, all digists are filtered out if present
+# @param package_list the list of packages to install, at least one must be given, or an 
+# error of unsupported 'os' is raised
+# @param tempfile_contents the text to be included in the tempfile, all digits are 
+# filtered out if present
 #
 class myservice (
   Enum['running', 'stopped'] $service_ensure,
@@ -658,8 +661,8 @@ class myservice (
   # there was a type mismatch for $package_list.
   #
   # The list can be "not given", or have an empty list of packages to install
-  # Here an assertion is made that the list is an Array of at least one String, and that the
-  # String is at least one character long.
+  # Here an assertion is made that the list is an Array of at least one String, and that 
+  # the String is at least one character long.
   #
   assert_type(Array[String[1], 1], $package_list) | $expected, $actual | {
     fail("Module ${module_name} does not support ${facts['os']['name']} as the list of packages is of type ${actual}"
@@ -686,7 +689,7 @@ class myservice (
 }
 ```
  
-In module's hiera.yaml:
+In module's `hiera.yaml`:
  
 ```
 ---
@@ -694,8 +697,8 @@ version: 5
 defaults:
   data_hash: yaml_data
  
-# The default values can be merged if users wants to extend with additional packages
-# If that is not wanted use 'default_hierarchy' instead of 'hierarchy'
+# The default values can be merged if you want to extend with additional packages
+# If not, use 'default_hierarchy' instead of 'hierarchy'
 #
 hierarchy:
   - name: "Per Operating System"
@@ -704,18 +707,21 @@ hierarchy:
     path: "common.yaml"
 ```
  
-In module's data/common.yaml
+In module's `data/common.yaml`:
+
 ```
 myservice::service_ensure: running
 ```
  
-In module's data/os/centos.yaml:
+In module's `data/os/centos.yaml`:
+
 ```
 myservice::package_list:
   - 'myservice-centos-package'
 ```
  
-In module's data/os/solaris.yaml:
+In module's `data/os/solaris.yaml`:
+
 ```
 myservice::package_list:
   - 'myservice-solaris-package1'
