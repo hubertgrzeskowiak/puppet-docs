@@ -804,33 +804,49 @@ class dhcp (
 
 ### 10.7 Parameter defaults
 
-When writing a module that accepts class and defined type parameters, appropriate defaults should be provided for optional parameters. Establishing good defaults gives the end user the option of not explicitly specifying the parameter when declaring the class or defined type. Provided defaults should be specified with the parameter and not inside the class or defined type.
+Adding default values to the parameters in classes and defined types makes your module easier to use. As of Puppet 4.9.0, use Hiera data in the module and rely on automatic parameter lookup for class parameters. For versions earlier than Puppet 4.9.0, use the "params.pp" pattern. In simple cases, you can also specify the default values directly in the class or defined type.
 
-When creating parameter defaults, you:
-
-* Must use fully qualified namespace variables when pulling the value from the module params class. This avoids namespace collisions. See [Namespacing Variables](#namespacing-variables) for more information.
-* Should use the `_` prefix to indicate a scope local variable for maintainability over time.
+Take care to declare the data type of parameters, as this provides automatic type assertions.
 
 **Good:**
 
 ```
-class my_module (
-  $source = $my_module::params::source,
-  $config = $my_module::params::config,
-){}
+# parameter defaults provided via APL > puppet 4.9.0
+class my_module(
+  String $source,
+  String $config )  {
+  # body of class
+}
 ```
 
-**Bad:**
+with a `hiera.yaml` in the root of the module:
 
 ```
-class my_module (
-  $source = undef,
-) {
-  if $source {
-    $_source = $source
-  } else {
-    $_source = $my_module::params::source
-  }
+---
+version: 5
+default_hierarchy: 
+  - name: "defaults"
+    path:   "defaults.yaml"
+    data_hash: yaml_data
+```
+
+and with the file `data/defaults.yaml`:
+
+```
+mymodule::source: 'default source value'
+mymodule::config: 'default config value'
+```
+
+This places the values in the defaults hierarchy, which means that the defaults are not merged into overriding values. If you want to merge the defaults into those values, change the `default_hierarchy` to `hierarchy`.
+
+**Puppet 4.8 and earlier**:
+
+```
+# using params.pp pattern < Puppet 4.9.0
+class my_module(
+  String $source = $mymodule::params::source,
+  String $config  = $mymodule::params::config)  {
+  # body of class
 }
 ```
 
