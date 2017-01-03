@@ -636,79 +636,93 @@ Classes and defined types must be structured to accomplish one task. Below is a 
 1. Next lines: Should declare resource defaults.
 1. Next lines:  Should override resources if necessary.
 
-Parameters should be [typed](https://docs.puppet.com/puppet/latest/lang_data_type.html#language:-data-types:-data-type-syntax). For custom validation, type the parameter with a generic type and make sure additional constraints imposed by your logic are documented
-for public classes and defined types. Each parameter should include a documentation comment.
+Parameters should be [typed](https://docs.puppet.com/puppet/latest/lang_data_type.html#language:-data-types:-data-type-syntax). For custom validation, type the parameter with a generic type and make sure additional constraints imposed by your logic are documented for public classes and defined types. Each parameter should include a documentation comment.
 
 
-The following example follows the recommended style: TODO: UPDATE EXAMPLE
+The following example follows the recommended style:
+
+In init.pp:
 
 ```
-    # init.pp
-    class myservice (
-      $service_ensure     = $myservice::params::service_ensure,
-      $package_list       = $myservice::params::package_list,
-      $tempfile_contents  = $myservice::params::tempfile_contents,
-    ) inherits myservice::params {
-
-      if !($service_ensure in [ 'running', 'stopped' ]) {
-        fail('ensure parameter must be running or stopped')
-      }
-
-      if !$package_list {
-        fail("Module ${module_name} does not support ${::operatingsystem}")
-      }
-
-      # temp file contents cannot contain numbers
-      case $tempfile_contents {
-        /\d/: {
-          $_tempfile_contents = regsubst($tempfile_contents, '\d', '', 'G')
-        }
-        default: {
-          $_tempfile_contents = $tempfile_contents
-        }
-      }
-
-      $variable = 'something'
-
-      Package { ensure => present, }
-
-      File {
-        owner => '0',
-        group => '0',
-        mode  => '0644',
-     }
-
-      package { $package_list: }
-
-      file { "/tmp/${variable}":
-        ensure   => present,
-        contents => $_tempfile_contents,
-      }
-
-      service { 'myservice':
-        ensure    => $service_ensure,
-        hasstatus => true,
-      }
-
-      Package[$package_list] -> Service['myservice']
-    }
-
-    # params.pp
-    class myservice::params {
-      $service_ensure = 'running'
-
-      case $::operatingsystem {
-        'centos': {
-          $package_list = 'myservice-centos-package'
-        }
-        'solaris': {
-          $package_list = [ 'myservice-solaris-package1', 'myservice-solaris-package2' ]
-        }
-        default: {
-          $package_list = undef
-        }
-      }
-    }
+# The `myservice` class installs packages, and ensures the state of 'myservice' and creates a tempfile with
+# given content. If the tempfile contents contains digits they are filtered out.
+#
+# @param service_ensure the wanted state of services
+# @param package_list the list of packages to install, at least one must be given, or an error of unsupported 'os' is raised
+# @param tempfile_contents the text ending up in the tempfile, all digists are filtered out if present
+#
+class myservice (
+  Enum['running', 'stopped'] $service_ensure,
+  String                     $tempfile_contents,
+  Optional[Array[String[1]]] $package_list = undef,
+) {
+ 
+  # Example of additional assertion with a better error message than just saying that
+  # there was a type mismatch for $package_list.
+  #
+  # The list can be "not given", or have an empty list of packages to install
+  # Here an assertion is made that the list is an Array of at least one String, and that the
+  # String is at least one character long.
+  #
+  assert_type(Array[String[1], 1], $package_list) | $expected, $actual | {
+    fail("Module ${module_name} does not support ${facts['os']['name']} as the list of packages is of type ${actual}"
+  }
+ 
+  package { $package_list :
+    ensure => present
+  }
+ 
+  file { "/tmp/${variable}":
+    ensure   => present,
+    contents => regsubst($tempfile_contents, '\d', '', 'G'),
+    owner    => '0',
+    group    => '0',
+    mode     => '0644',
+  }
+ 
+  service { 'myservice':
+    ensure    => $service_ensure,
+    hasstatus => true,
+  }
+ 
+  Package[$package_list] -> Service['myservice']
+}
+```
+ 
+In module's hiera.yaml:
+ 
+```
+---
+version: 5
+defaults:
+  data_hash: yaml_data
+ 
+# The default values can be merged if users wants to extend with additional packages
+# If that is not wanted use 'default_hierarchy' instead of 'hierarchy'
+#
+hierarchy:
+  - name: "Per Operating System"
+    path: "os/%{os.name}.yaml"
+  - name: "Common"
+    path: "common.yaml"
+```
+ 
+In module's data/common.yaml
+```
+myservice::service_ensure: running
+```
+ 
+In module's data/os/centos.yaml:
+```
+myservice::package_list:
+  - 'myservice-centos-package'
+```
+ 
+In module's data/os/solaris.yaml:
+```
+myservice::package_list:
+  - 'myservice-solaris-package1'
+  - 'myservice-solaris-package2'
 ```
 
 ### 10.3. Public and private
