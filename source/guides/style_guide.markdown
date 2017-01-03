@@ -628,16 +628,13 @@ include bar
 Classes and defined types must be structured to accomplish one task. Below is a line-by-line general layout of what lines of code should come first, second, and so on. 
 
 1. First line: Name of class or type.
-1. Following lines, if applicable: Define parameters.
-1. Next lines: Includes should come after parameters are defined and before validation.
-1. Next lines: Should validate* any parameters and fail catalog compilation if any
+1. Following lines, if applicable: Define parameters. Parameters should be [typed](https://docs.puppet.com/puppet/latest/lang_data_type.html#language:-data-types:-data-type-syntax) and should include a documentation comment.
+1. Next lines: Includes and validation come after parameters are defined. Includes may come before or after validation, but should be grouped separately, with all includes and requires in one group and all validations in another. 
+   * Validations should validate any parameters and fail catalog compilation if any
     parameters are invalid. (See [ntp](https://github.com/puppetlabs/puppetlabs-ntp/blob/3.3.0/manifests/init.pp#L28-L49) for an example.)
 1. Next lines, if applicable: Should declare local variables and perform variable munging.
 1. Next lines: Should declare resource defaults.
 1. Next lines:  Should override resources if necessary.
-
-Parameters should be [typed](https://docs.puppet.com/puppet/latest/lang_data_type.html#language:-data-types:-data-type-syntax). For custom validation, type the parameter with a generic type and make sure additional constraints imposed by your logic are documented for public classes and defined types. Each parameter should include a documentation comment.
-
 
 The following example follows the recommended style:
 
