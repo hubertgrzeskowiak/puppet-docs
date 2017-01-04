@@ -12,9 +12,6 @@ Puppet Language Style Guide: Version 3.0
 
 Puppet: Version 4.0+
 
-(Note: While the style guide maps to Puppet 4.0, it also applies to Puppet 3.0.x and up when using the future parser.) [TODO: "many recommendations apply to 3.0+, even w/legacy parser?]
-
-
 ## 1. Terminology
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
@@ -27,7 +24,6 @@ Unless explicitly called out, everything discussed here applies specifically to 
 
 The purpose of this style guide is to promote consistent formatting across modules (from Puppet and the community), giving users and developers of Puppet modules a common pattern, design, and style to follow. Additionally, consistency in code and module structure makes continued development and contributions easier.
 
-Suggest using puppet-lint and metadata-json-lint within your module to check for compliance with the style guide.
 We recommend using [puppet-lint](http://puppet-lint.com/) and [metadata-json-lint](https://github.com/nibalizer/metadata-json-lint) within your module to check for compliance with the style guide.
 
 ## 3. Guiding principles
@@ -40,11 +36,11 @@ We can never cover every circumstance you might run into when developing Puppet 
     
 2. **Scoping and simplicity are key.**
 
-    When in doubt, err on the side of simplicity. A module should contain related resources that enable it to accomplish a task. If you describe the function of your module and you find yourself using the word 'and,' it's time to split the module. You should have one goal, with all your classes and parameters focused on achieving it.
+    When in doubt, err on the side of simplicity. A module should contain related resources that enable it to accomplish a task. If you describe the function of your module and you find yourself using the word "and," consider splitting the module. You should have one goal, with all your classes and parameters focused on achieving it.
 
 3. **Your module is a piece of software.**
 
-    At least, you should treat it that way. When it comes to making decisions, choose the option that is easier to sustain in the long term.
+    At least, you should treat it that way. When it comes to making decisions, choose the option that is easier to maintain in the long term.
 
 ## 4. Versioning
 
@@ -145,8 +141,8 @@ service { 'foo':
 
 ## 6. Quoting
 
-* All strings must be enclosed in single quotes, unless they contain variables, single quotes, or escaped characters not supported by single quoted strings
-* Quoting is optional when the string is an enumerable set of options (such as present/absent).
+* All strings must be enclosed in single quotes, unless they contain variables, single quotes, or escaped characters not supported by single quoted strings.
+* Quoting is optional when the string is an enumerable set of options, such as present/absent.
 * All variables must be enclosed in braces when interpolated in a string. For example:
 
 **Good:**
@@ -942,11 +938,11 @@ file { 'Required VHost directory':
 
 ## 13.1 Referencing facts
 
-When referencing facts, prefer the `$facts` hash to plain topscope variables (such as `$::operatingsystem`). Although plain topscope variables are easier to write, the `$facts` hash is clearer, easier to read, and distinguishes facts from other topscope variables.
+When referencing facts, prefer the `$facts` hash to plain top-scope variables (such as `$::operatingsystem`). Although plain top-scope variables are easier to write, the `$facts` hash is clearer, easier to read, and distinguishes facts from other top-scope variables.
 
 ### 13.2. Namespacing variables
 
-When referencing top-scope variables other than facts, explicitly specify empty namespaces for clarity and improved readability. This includes topscope variables set by the node classifier and in the main manifest.
+When referencing top-scope variables other than facts, explicitly specify absolute namespaces for clarity and improved readability. This includes top-scope variables set by the node classifier and in the main manifest.
  
 This is not necessary for:
  
@@ -959,7 +955,7 @@ These special variable names are protected; because you cannot create local vari
 **Good:**
 
 ```
-    $facts::operatingsystem
+    $facts[::operatingsystem]
 ```
 
 **Bad:**
@@ -1077,15 +1073,34 @@ All publicly available modules should include the documentation covered below.
 
 ### 17.1 README
 
-Your module should have a README in .md (or .markdown) format. READMEs help users of your module get the full benefit of your work. There is a [Puppet README template](https://docs.puppet.com/puppet/latest/reference/READMEtemplate.txt) available for your use; it can also be obtained by running `puppet module generate` (available in Puppet 3.6 and above). Using the .md/.markdown format allows your README to be parsed and displayed by both GitHub and the Puppet Forge.
+Your module should have a README in .md (or .markdown) format. READMEs help users of your module get the full benefit of your work. The [Puppet README template](https://docs.puppet.com/puppet/latest/reference/READMEtemplate.txt) offers a basic format you can use. If you create modules with `puppet module generate`, the generated README includes the template. Using the .md/.markdown format allows your README to be parsed and displayed by Puppet Strings, GitHub, and the Puppet Forge.
 
-Puppet [Strings](https://github.com/puppetlabs/puppetlabs-strings) uses in-code comments to generate html docs for Puppet modules.
+There's an entire [guide](https://docs.puppet.com/puppet/latest/reference/modules_documentation.html) to writing a great README, but overall your README should:
 
-There's an entire [guide](https://docs.puppet.com/puppet/latest/reference/modules_documentation.html) to writing a great README, but overall you should:
-
-* Call out what your module does.
+* Summarize what your module does.
+* Note any setup requirements or limitations (such as "This module requires the puppetlabs-apache module and only works on Ubuntu.").
 * Note any part of a user's system the module might impact (for example, "This module overwrites everything in animportantfile.conf.").
-* List all of the classes, defined types, types, providers, and parameters the user might need to configure with a brief description, the default values (if any), and what the valid options are.
+* Describe how to customize and configure the module.
+* Include usage examples and code samples for the common use cases for your module.
+
+### 17.2 Documenting Puppet code
+
+Use Puppet [Strings](https://github.com/puppetlabs/puppetlabs-strings) code comments to document your Puppet classes, defined types, functions, and resource types and providers. Strings processes the README and comments from your code into HTML or JSON format documentation. This allows module users to generate complete documentation for your module with Strings.
+
+Include Strings comments for each element (class, function, parameter, etc) in your module. Comments can contain the following information, arranged in this order:
+
+* May include the data type in brackets. Puppet 4 automatically detects the data type, but Puppet 3 does not. Including the data type ensures that it is included in documentation that Puppet 3 users generate.
+* Must include a description, giving an overview of what the element does.
+* Should include any additional information about valid values that is not clear from the data type. (For example, if the data type is [String], but the value must be a path.)
+* Must include the default value, if any for that element.
+
+For example:
+
+```
+# @param config_epp [String] Specifies a file to act as a EPP template for the config file. Valid options: a path (absolute, or relative to the module path). Example value: 'ntp/ntp.conf.epp'. A validation error is thrown if you supply both this param **and** the `config_template` param.
+```
+
+If you do not include Strings code comments, you should include a Reference section in your README with a complete list of all classes, types, providers, defined types, and parameters that the user can configure. Include a brief description, the valid options, and the default values (if any).
 
 ### 17.2 CHANGELOG
 
