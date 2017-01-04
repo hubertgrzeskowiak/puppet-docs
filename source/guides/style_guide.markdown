@@ -142,37 +142,40 @@ service { 'foo':
 
 ## 6. Quoting
 
-* All strings must be enclosed in single quotes, unless they contain variables, single quotes, or escaped characters not supported by single quoted strings.
-* Quoting is optional when the string is an enumerable set of options, such as present/absent.
+* All strings must be enclosed in single quotes, unless the string:
+  * Contains variables.
+  * Contains single quotes
+  * Contains escaped characters not supported by single-quoted strings.
+  * Is an enumerable set of options, such as present/absent.
 * All variables must be enclosed in braces when interpolated in a string. For example:
 
-**Good:**
+  **Good:**
 
-```
+  ```
     "/etc/${file}.conf"
     "${::operatingsystem} is not supported by ${module_name}"
-```
+  ```
 
-**Bad:**
+  **Bad:**
 
-```
+  ```
     "/etc/$file.conf"
     "$::operatingsystem is not supported by $module_name"
-```
+  ```
 
 * Double quotes should be used rather than escaping when a string contains single quotes, unless that would require an inconvenient amount of additional escaping.
 
-**Good:**  
+  **Good:**  
 
-```
+  ```
 warning("Class['apache'] parameter purge_vdir is deprecated in favor of purge_configs")
-```
+  ```
 
-**Bad:**
+  **Bad:**
 
-```
+  ```
 warning('Class[\'apache\'] parameter purge_vdir is deprecated in favor of purge_configs')
-```
+  ```
 
 ### 6.1. Escape characters
 
@@ -704,20 +707,20 @@ hierarchy:
     path: "common.yaml"
 ```
  
-In module's `data/common.yaml`:
+In module `data/common.yaml`:
 
 ```
 myservice::service_ensure: running
 ```
  
-In module's `data/os/centos.yaml`:
+In module `data/os/centos.yaml`:
 
 ```
 myservice::package_list:
   - 'myservice-centos-package'
 ```
  
-In module's `data/os/solaris.yaml`:
+In module `data/os/solaris.yaml`:
 
 ```
 myservice::package_list:
