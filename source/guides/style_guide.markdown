@@ -57,29 +57,30 @@ Module manifests:
 * Must not contain trailing whitespace,
 * Must include trailing commas after all resource attributes and parameter definitions,
 * Must end the last line with a new line,
-* Should not exceed a 140-character line width, except where such a limit would be impractical,
-* Should leave one empty line between resources, except when using dependency chains, and
-* May align hash rockets (`=>`) within blocks of attributes, remembering to arrange hashes for maximum readability first.
 * Must use one space between the resource type and opening brace, one space between the opening brace and the title, and no spaces between the title and colon.
 
-**Good**:
+  **Good**:
 
-```
+  ```
 file { '/tmp/foo':
-```
+  ```
 
-**Bad**:
+  **Bad**:
 
-```
-# space between title and colon
-file { '/tmp/foo' :
+  ```
+  # space between title and colon
+  file { '/tmp/foo' :
+  
+  # no spaces
+  file{'/tmp/foo':
 
-# no spaces
-file{'/tmp/foo':
+  # too many spaces
+  file     { '/tmp/foo':
+  ```
 
-# too many spaces
-file     { '/tmp/foo':
-```
+* Should not exceed a 140-character line width, except where such a limit would be impractical,
+* Should leave one empty line between resources, except when using dependency chains, and
+* May align hash rockets (`=>`) within blocks of attributes, one space after the longest resource key, arranging hashes for maximum readability first.
 
 ### 5.1: Arrays and hashes
 
