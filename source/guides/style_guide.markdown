@@ -940,9 +940,13 @@ file { 'Required VHost directory':
 
 ## 13. Variables
 
-### 13.1. Namespacing variables
+## 13.1 Referencing facts
 
-When referencing top-scope variables, including facts, explicitly specify empty namespaces for clarity and improved readability.
+When referencing facts, prefer the `$facts` hash to plain topscope variables (such as `$::operatingsystem`). Although plain topscope variables are easier to write, the `$facts` hash is clearer, easier to read, and distinguishes facts from other topscope variables.
+
+### 13.2. Namespacing variables
+
+When referencing top-scope variables other than facts, explicitly specify empty namespaces for clarity and improved readability. This includes topscope variables set by the node classifier and in the main manifest.
  
 This is not necessary for:
  
@@ -955,18 +959,24 @@ These special variable names are protected; because you cannot create local vari
 **Good:**
 
 ```
-    $::operatingsystem
+    $facts::operatingsystem
 ```
 
 **Bad:**
 
 ```
+    $::operatingsystem
+```
+
+**Very Bad**
+
+```
     $operatingsystem
 ```
 
-### 13.2. Variable format
+### 13.3. Variable format
 
-When defining variables you must only use numbers, lowercase letters, and underscores. You should not use camelcasing (uppercased letters within a word, such as "CamelCase"), as it introduces inconsistency in style. You must also not use dashes, as they are not syntactically valid.
+When defining variables you must only use numbers, lowercase letters, and underscores. Do not use uppercased letters within a word, such as "CamelCase", as it introduces inconsistency in style. You must not use dashes, as they are not syntactically valid.
 
 **Good:**
 
@@ -983,6 +993,8 @@ $fooBar
 $someLongVariable
 $foo-bar123
 ```
+
+
 
 ## 14. Conditionals
 
@@ -1067,12 +1079,12 @@ All publicly available modules should include the documentation covered below.
 
 Your module should have a README in .md (or .markdown) format. READMEs help users of your module get the full benefit of your work. There is a [Puppet README template](https://docs.puppet.com/puppet/latest/reference/READMEtemplate.txt) available for your use; it can also be obtained by running `puppet module generate` (available in Puppet 3.6 and above). Using the .md/.markdown format allows your README to be parsed and displayed by both GitHub and the Puppet Forge.
 
-If you are prolific with your in-code comments, you can use `puppet doc` up until Puppet 4 is released. If you're currently using the future parser, you might want to check out [strings](https://github.com/puppetlabs/puppetlabs-strings), the replacement for `puppet doc` that (only) works with the future parser. 
+Puppet [Strings](https://github.com/puppetlabs/puppetlabs-strings) uses in-code comments to generate html docs for Puppet modules.
 
 There's an entire [guide](https://docs.puppet.com/puppet/latest/reference/modules_documentation.html) to writing a great README, but overall you should:
 
 * Call out what your module does.
-* Note any part of a user's system the module might impact (e.g. "This module overwrites everything in animportantfile.conf.").
+* Note any part of a user's system the module might impact (for example, "This module overwrites everything in animportantfile.conf.").
 * List all of the classes, defined types, types, providers, and parameters the user might need to configure with a brief description, the default values (if any), and what the valid options are.
 
 ### 17.2 CHANGELOG
