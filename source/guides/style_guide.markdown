@@ -877,11 +877,11 @@ define haproxy::frontend (
 
 ### 11.1. Class inheritance
 
-Class inheritance should not be used. Instead, use data binding instead of `params.pp` pattern. Inheritance should only be used for `params.pp`, which is not recommended in Puppet 4.
+Class inheritance should not be used. Use data binding instead of params.pp pattern. Inheritance should only be used for params.pp, which is not recommended in Puppet 4.
 
-Inheritance can be used within a module, but must not be used across module
-namespaces. Cross-module dependencies should be satisfied in a more portable
-way, such as with include statements or relationship declarations.
+For maintaining older modules, inheritance can be used, but must not be used across module
+namespaces. Cross-module dependencies should be satisfied in a more portable way, such as with include statements or relationship declarations. Class inheritance should only be used for `myclass::params` parameter defaults. Other use cases can be accomplished through the addition of parameters or conditional logic. 
+
 
 **Good:**
 
@@ -903,72 +903,6 @@ way, such as with include statements or relationship declarations.
     class wordpress inherits apache { ... }
 ```
 
-Generally, inheritance should be avoided when alternatives are viable. For
-example, rather than using inheritance to override relationships in an existing
-class when stopping a service, consider using a single class with an `ensure`
-parameter and conditional relationship declarations. For instance,
-
-```
-    class bluetooth (
-      $ensure      = 'present',
-      $autoupgrade = false,
-    ) {
-       # Validate class parameter inputs. (Fail early and fail hard)
-
-       if ! ($ensure in [ 'present', 'absent' ]) {
-         fail('bluetooth ensure parameter must be absent or present')
-       }
-
-       if ! ($autoupgrade in [ true, false ]) {
-         fail('bluetooth autoupgrade parameter must be true or false')
-       }
-
-       # Set local variables based on the desired state
-
-       if $ensure == 'present' {
-         $service_enable = true
-         $service_ensure = 'running'
-         if $autoupgrade {
-           $package_ensure = 'latest'
-         } else {
-           $package_ensure = 'present'
-         }
-       } else {
-         $service_enable = false
-         $service_ensure = 'stopped'
-         $package_ensure = 'absent'
-       }
-
-       # Declare resources without any relationships in this section
-
-       package { [ 'bluez-libs', 'bluez-utils']:
-         ensure => $package_ensure,
-       }
-
-       service { 'hidd':
-         enable         => $service_enable,
-         ensure         => $service_ensure,
-         status         => 'source /etc/init.d/functions; status hidd',
-         hasstatus      => true,
-         hasrestart     => true,
-      }
-
-      # Finally, declare relations based on desired behavior
-
-      if $ensure == 'present' {
-        Package['bluez-libs']  -> Package['bluez-utils']
-        Package['bluez-libs']  ~> Service['hidd']
-        Package['bluez-utils'] ~> Service['hidd']
-      } else {
-        Service['hidd']        -> Package['bluez-utils']
-        Package['bluez-utils'] -> Package['bluez-libs']
-      }
-    }
-```
-
-Remember:
-
-Class inheritance should only be used for `myclass::params` parameter defaults. Other use cases can be accomplished through the addition of parameters or conditional logic. 
 
 ### 11.2 About publicly available modules
 
