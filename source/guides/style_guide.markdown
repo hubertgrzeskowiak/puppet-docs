@@ -1089,14 +1089,13 @@ There's an entire [guide](https://docs.puppet.com/puppet/latest/reference/module
 
 ### 17.2 Documenting Puppet code
 
-Use Puppet [Strings](https://github.com/puppetlabs/puppetlabs-strings) code comments to document your Puppet classes, defined types, functions, and resource types and providers. Strings processes the README and comments from your code into HTML or JSON format documentation. This allows module users to generate complete documentation for your module with Strings.
+Use [Puppet Strings](https://github.com/puppetlabs/puppetlabs-strings) code comments to document your Puppet classes, defined types, functions, and resource types and providers. Strings processes the README and comments from your code into HTML or JSON format documentation. This allows you and your users to generate detailed documentation for your module.
 
-Include Strings comments for each element (class, function, parameter, etc) in your module. Comments can contain the following information, arranged in this order:
+Include comments for each element (classes, functions, defined types, parameters, and so on) in your module. See [Puppet Strings](https://github.com/puppetlabs/puppet-strings) documentation for details on usage, installation, and correctly writing documentation comments. Comments should contain the following information, arranged in this order:
 
-* May include the data type in brackets. Puppet 4 automatically detects the data type, but Puppet 3 does not. Including the data type ensures that it is included in documentation that Puppet 3 users generate.
-* Must include a description, giving an overview of what the element does.
-* Should include any additional information about valid values that is not clear from the data type. (For example, if the data type is [String], but the value must be a path.)
-* Must include the default value, if any for that element.
+* A description giving an overview of what the element does.
+* Any additional information about valid values that is not clear from the data type. (For example, if the data type is [String], but the value must be a path.)
+* The default value, if any for that element.
 
 For example:
 
