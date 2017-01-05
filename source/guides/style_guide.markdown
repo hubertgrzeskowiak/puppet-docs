@@ -1089,7 +1089,7 @@ There's an entire [guide](https://docs.puppet.com/puppet/latest/reference/module
 
 ### 17.2 Documenting Puppet code
 
-Use [Puppet Strings](https://github.com/puppetlabs/puppetlabs-strings) code comments to document your Puppet classes, defined types, functions, and resource types and providers. Strings processes the README and comments from your code into HTML or JSON format documentation. This allows you and your users to generate detailed documentation for your module.
+Use [Puppet Strings](https://github.com/puppetlabs/puppet-strings) code comments to document your Puppet classes, defined types, functions, and resource types and providers. Strings processes the README and comments from your code into HTML or JSON format documentation. This allows you and your users to generate detailed documentation for your module.
 
 Include comments for each element (classes, functions, defined types, parameters, and so on) in your module. See [Puppet Strings](https://github.com/puppetlabs/puppet-strings) documentation for details on usage, installation, and correctly writing documentation comments. Comments should contain the following information, arranged in this order:
 
