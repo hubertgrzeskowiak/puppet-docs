@@ -144,9 +144,9 @@ service { 'foo':
 
 * All strings must be enclosed in single quotes, unless the string:
   * Contains variables.
-  * Contains single quotes
+  * Contains single quotes.
   * Contains escaped characters not supported by single-quoted strings.
-  * Is an enumerable set of options, such as present/absent.
+  * Is an enumerable set of options, such as present/absent, in which case the single quotes are optional.
 * All variables must be enclosed in braces when interpolated in a string. For example:
 
   **Good:**
