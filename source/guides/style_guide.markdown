@@ -187,7 +187,7 @@ Unicode character escapes using fewer than 4 hex digits, as in `\u040`, results 
 
 ## 7. Comments
 
-You must use hash comments (`# This is a comment`), not `/* */` comments. Comments should explain the **why**, not the **how**, of your code.
+Comments must be hash comments (`# This is a comment`), not `/* */` comments. Comments should explain the **why**, not the **how**, of your code.
 
 **Good:**
 
@@ -202,6 +202,10 @@ file { '/etc/ntp.conf': … }
 /* Creates file /etc/ntp.conf */
 file { '/etc/ntp.conf': … }
 ```
+
+### 7.1 Documentation comments
+
+Documentation comments for Puppet Strings should be included for each of your classes, defined types, functions, and resource types and providers. See the [documentation section](#documenting-puppet-code) of this guide for complete documentation recommendations. If used, documentation comments must precede the name of the element.
 
 ## 8. Module metadata
 
@@ -339,7 +343,6 @@ file { "/etc/passwd":
   *      => $file_ownership,
 }
 ```
-
 
 ### 9.4. Resource arrangement
 
@@ -488,43 +491,119 @@ file { '/var/log/syslog':
     }
 ```
 
-### 9.7. Resource defaults
+#### 9.6.5 Multiple resources
 
-Resource defaults should be used in a very controlled manner and should only
-be declared at the edges of your manifest ecosystem. Specifically, they may be declared:
+Multiple resources declared in a single block should be used only when there is also a default set of options for the resource type.
+
+**Good**:
+
+```
+file {
+  default :
+    ensure => 'file'
+    mode   => '0666' ;
+ 
+  '/foo' :
+    user => root;
+ 
+  '/bar' :
+    user => staff;
+}
+ 
+# Give the defaults a name if used several times
+$our_default_file_attributes = { 
+  'mode' => '0666', 
+  'ensure' => 'file', 
+}
+ 
+file {
+  default :
+    * => $our_default_file_attributes ;
+ 
+  '/foo' :
+    user => root;
+ 
+  '/bar' :
+    user => staff;
+}
+  
+ 
+# spell out "magic" iteration
+[ '/foo', '/bar' ].each | $path | {
+ 
+  file { $path :
+    ensure => 'file',
+  }
+}
+ 
+# spell out "magic" iteration
+$array_of_paths.each | $path |  {
+ 
+  file { $path :
+    ensure => 'file',
+  }
+}
+```
+
+**Bad**:
+
+```
+
+file {
+  '/foo':
+    user     => root,
+    ensure => 'file',
+    mode => '0666' ;
+ 
+  '/bar':
+    user     => staff,
+    ensure => 'file',
+    mode => '0774' ;
+}
+ 
+file { ['/foo', '/bar']:
+  ensure => 'file',
+}
+ 
+file { $array_of_paths :
+  ensure => 'file',
+}
+```
+
+### 9.7 Legacy style defaults
+
+Avoid legacy style defaults. If you do use them, they should occur:
 
 * At top scope in site.pp, or
-* In a class which is guaranteed to never declare or be inherited by 
-a class or defined type from another module.
+* In a class that is guaranteed never to declare or be inherited by another module's class or defined type.
 
-This is due to the way resource defaults propagate through dynamic scope, which can have 
-unpredictable effects far away from where the default was declared.
+This is because resource defaults propagate through dynamic scope, which can have unpredictable effects far away from where the default was declared.
 
-**Good:**
+**Acceptable**:
 
 ```
-    # /etc/puppetlabs/puppet/manifests/site.pp:
-    File {
-      owner => 'root',
-      group => '0',
-      mode  => '0644',
-    }
+# /etc/puppetlabs/puppet/manifests/site.pp:
+File {
+  owner => 'root',
+  group => '0',
+  mode  => '0644',
+}
 ```
 
-**Bad:**
+**Bad**:
 
 ```
-    # /etc/puppetlabs/puppet/modules/apache/manifests/init.pp
-    File {
-      owner => 'nobody',
-      group => 'nogroup',
-      mode  => '0600',
-    }
+# /etc/puppetlabs/puppet/modules/apache/manifests/init.pp
+File {
+  owner => 'nobody',
+  group => 'nogroup',
+  mode  => '0600',
+}
 
-    concat { $config_file_path:
-      notify  => Class['Apache::Service'],
-      require => Package['httpd'],
-    }
+concat { $config_file_path:
+  notify  => Class['Apache::Service'],
+  require => Package['httpd'],
+}
 ```
 
 ### 9.8 Resource attribute indentation and alignment
@@ -627,8 +706,10 @@ include bar
 
 Classes and defined types must be structured to accomplish one task. Below is a line-by-line general layout of what lines of code should come first, second, and so on. 
 
+Documentation [comments](#documentation-comments) for Puppet Strings should be included for each class or defined type. See the [documentation section](#documenting-puppet-code) of this guide for complete documentation recommendations. If used, documentation comments must precede the name of the element.
+
 1. First line: Name of class or type.
-1. Following lines, if applicable: Define parameters. Parameters should be [typed](https://docs.puppet.com/puppet/latest/lang_data_type.html#language:-data-types:-data-type-syntax) and should include a documentation comment.
+1. Following lines, if applicable: Define parameters. Parameters should be [typed](https://docs.puppet.com/puppet/latest/lang_data_type.html#language:-data-types:-data-type-syntax).
 1. Next lines: Includes and validation come after parameters are defined. Includes may come before or after validation, but should be grouped separately, with all includes and requires in one group and all validations in another. 
    * Validations should validate any parameters and fail catalog compilation if any
     parameters are invalid. (See [ntp](https://github.com/puppetlabs/puppetlabs-ntp/blob/3.3.0/manifests/init.pp#L28-L49) for an example.)
@@ -1095,7 +1176,7 @@ There's an entire [guide](https://docs.puppet.com/puppet/latest/reference/module
 
 Use [Puppet Strings](https://github.com/puppetlabs/puppet-strings) code comments to document your Puppet classes, defined types, functions, and resource types and providers. Strings processes the README and comments from your code into HTML or JSON format documentation. This allows you and your users to generate detailed documentation for your module.
 
-Include comments for each element (classes, functions, defined types, parameters, and so on) in your module. See [Puppet Strings](https://github.com/puppetlabs/puppet-strings) documentation for details on usage, installation, and correctly writing documentation comments. Comments should contain the following information, arranged in this order:
+Include comments for each element (classes, functions, defined types, parameters, and so on) in your module. If used, comments must precede the code for that element. See [Puppet Strings](https://github.com/puppetlabs/puppet-strings) documentation for details on usage, installation, and correctly writing documentation comments. Comments should contain the following information, arranged in this order:
 
 * A description giving an overview of what the element does.
 * Any additional information about valid values that is not clear from the data type. (For example, if the data type is [String], but the value must be a path.)
@@ -1104,7 +1185,10 @@ Include comments for each element (classes, functions, defined types, parameters
 For example:
 
 ```
-# @param config_epp [String] Specifies a file to act as a EPP template for the config file. Valid options: a path (absolute, or relative to the module path). Example value: 'ntp/ntp.conf.epp'. A validation error is thrown if you supply both this param **and** the `config_template` param.
+# @param config_epp Specifies a file to act as a EPP template for the config file. Valid 
+# options: a path (absolute, or relative to the module path). Example value: 
+# 'ntp/ntp.conf.epp'. A validation error is thrown if you supply both this param **and**
+# the `config_template` param.
 ```
 
 If you do not include Strings code comments, you should include a Reference section in your README with a complete list of all classes, types, providers, defined types, and parameters that the user can configure. Include a brief description, the valid options, and the default values (if any).
@@ -1119,5 +1203,5 @@ Your module should have a CHANGELOG in .md (or .markdown) format. Your CHANGELOG
 
 ### 18. Verification and testing
 
-We recommend [puppet-lint](http://puppet-lint.com/) and [metadata-json-lint](https://github.com/nibalizer/metadata-json-lint) for checking your module's style compliance. For testing your module, we recommend rspec: see [rspec](https://www.relishapp.com/rspec/) and [Better Specs](http://betterspecs.org/) for documentation.
+We recommend [puppet-lint](http://puppet-lint.com/) and [metadata-json-lint](https://github.com/voxpupuli/metadata-json-lint) for checking your module's style compliance. For testing your module, we recommend rspec. See [rspec-puppet](https://github.com/rodjek/rspec-puppet/#rspec-tests-for-your-puppet-manifests--modules) for information on writing rspec tests for Puppet.
 
