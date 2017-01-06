@@ -916,7 +916,7 @@ Since defined resource types can have multiple instances, resource names must ha
 
 **Good:**
 
-```
+```puppet
 define apache::listen {
   $listen_addr_port = $name
 
@@ -932,9 +932,13 @@ define apache::listen {
 **Bad:**
 
 ```
-file { 'Required VHost directory':
-  path   => '/etc/apache/vhost/corpsite',
-  ensure => directory,
+define apache::listen {
+  # Template uses: $name
+  concat::fragment { 'Listen port':
+    ensure  => present,
+    target  => $::apache::ports_file,
+    content => template('apache/listen.erb'),
+  }
 }
 ```
 
@@ -1112,4 +1116,8 @@ Your module should have a CHANGELOG in .md (or .markdown) format. Your CHANGELOG
 * Have entries for each release. 
 * List bugfixes and features included in the release. 
 * Specifically call out backwards-incompatible changes
+
+### 18. Verification and testing
+
+We recommend [puppet-lint](http://puppet-lint.com/) and [metadata-json-lint](https://github.com/nibalizer/metadata-json-lint) for checking your module's style compliance. For testing your module, we recommend rspec: see [rspec](https://www.relishapp.com/rspec/) and [Better Specs](http://betterspecs.org/) for documentation.
 
