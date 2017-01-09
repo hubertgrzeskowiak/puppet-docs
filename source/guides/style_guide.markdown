@@ -572,21 +572,15 @@ file { $array_of_paths :
 
 ### 9.7 Legacy style defaults
 
-Avoid legacy style defaults. If you do use them, they should occur:
-
-* At top scope in site.pp, or
-* In a class that is guaranteed never to declare or be inherited by another module's class or defined type.
-
-This is because resource defaults propagate through dynamic scope, which can have unpredictable effects far away from where the default was declared.
+Avoid legacy style defaults. If you do use them, they should occur only at top scope in your site manifest. This is because resource defaults propagate through dynamic scope, which can have unpredictable effects far away from where the default was declared.
 
 **Acceptable**:
 
 ```
-# /etc/puppetlabs/puppet/manifests/site.pp:
-File {
-  owner => 'root',
-  group => '0',
-  mode  => '0644',
+# site.pp:
+ 
+Package {
+  provider => 'zypper',
 }
 ```
 
